@@ -15,8 +15,17 @@ At build time the app downloads the MediaPipe hand_landmarker.task model
 from Google, which is distributed under its own terms:
   https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
 
-The sound effects in app/src/main/res/raw/ were synthesized from scratch
-for this project and are covered by the same Apache 2.0 license.
+The sound effects in app/src/main/res/raw/ are from Pixabay and are used
+under the Pixabay Content License (https://pixabay.com/service/license-summary/),
+not the Apache License. They have been renamed but are otherwise unmodified.
+  laser_clash.mp3  "lightsaber clash" by freesound_community
+                   https://pixabay.com/sound-effects/film-special-effects-lightsaber-clash-88733/
+  laser_move.mp3   "swing3" by freesound_community
+                   https://pixabay.com/sound-effects/musical-swing3-94210/
+  laser_1.mp3      from Pixabay's lightsaber sound effects; the original page
+                   has not been identified
+                   https://pixabay.com/sound-effects/search/lightsaber/
 
-MediaPipe is a trademark of Google LLC. This project is not affiliated
-with, sponsored by, or endorsed by Google.
+MediaPipe is a trademark of Google LLC. Lightsaber is a trademark of
+Lucasfilm Ltd. This project is not affiliated with, sponsored by, or
+endorsed by Google or Lucasfilm.
