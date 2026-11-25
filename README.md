@@ -1,6 +1,6 @@
 # Laser Bird
 
-Android app for twiddling your thumbs (okay fingers). My 11 year old
+Android app for twiddling your thumbs ... I mean fingers. My 11 year old
 daughter and I built this together on May 4th.
 
 Hand tracking uses the [MediaPipe Hand Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
