@@ -1,0 +1,22 @@
+Laser Bird
+Copyright 2025 Jeff Breidenbach
+
+This product is derived from the MediaPipe HandLandmarker Android example
+in the mediapipe-samples repository:
+  https://github.com/google-ai-edge/mediapipe-samples
+  Copyright 2022 The TensorFlow Authors. All Rights Reserved.
+  Licensed under the Apache License, Version 2.0.
+
+Files carrying a "Modifications Copyright" line have been changed from the
+original. Files without one are unmodified apart from the Java/Kotlin
+package name.
+
+At build time the app downloads the MediaPipe hand_landmarker.task model
+from Google, which is distributed under its own terms:
+  https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
+
+The sound effects in app/src/main/res/raw/ were synthesized from scratch
+for this project and are covered by the same Apache 2.0 license.
+
+MediaPipe is a trademark of Google LLC. This project is not affiliated
+with, sponsored by, or endorsed by Google.
