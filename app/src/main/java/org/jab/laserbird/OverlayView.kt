@@ -336,7 +336,6 @@ class OverlayView(context: Context?, attrs: AttributeSet?) :
         style = Paint.Style.FILL
         isAntiAlias = true
         maskFilter = BlurMaskFilter(10f, BlurMaskFilter.Blur.NORMAL)
-        alpha = 255
     }
 
     private fun drawLaser(

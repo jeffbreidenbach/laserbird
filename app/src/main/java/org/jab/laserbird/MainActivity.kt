@@ -20,6 +20,7 @@
 package org.jab.laserbird
 
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
@@ -43,9 +44,8 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding.navigation.setOnNavigationItemReselectedListener {
             // ignore the reselection
         }
-    }
-
-    override fun onBackPressed() {
-       finish()
+        onBackPressedDispatcher.addCallback(this) {
+            finish()
+        }
     }
 }
