@@ -66,6 +66,11 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Lets a debug build be installed alongside the release app.
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+        }
         release {
             if (canSignRelease) {
                 signingConfig signingConfigs.release
