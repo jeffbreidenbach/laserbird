@@ -19,7 +19,6 @@
  */
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
     id 'de.undercouch.download'
 }
 
@@ -41,26 +40,26 @@ def keyPass = keystoreProps['keyPassword'] ?: System.getenv('KEY_PASSWORD') ?: s
 def canSignRelease = keystorePropsFile.exists() && storePass
 
 android {
-    namespace 'org.jab.laserbird'
-    compileSdk 36
+    namespace = 'org.jab.laserbird'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId "org.jab.laserbird"
-        minSdk 24
-        targetSdk 34
-        versionCode 6
-        versionName "1.0.5"
+        applicationId = "org.jab.laserbird"
+        minSdk = 24
+        targetSdk = 37
+        versionCode = 6
+        versionName = "1.0.5"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     signingConfigs {
         release {
             if (canSignRelease) {
-                storeFile file(keystoreProps['storeFile'])
-                storePassword storePass
-                keyAlias keystoreProps['keyAlias']
-                keyPassword keyPass
+                storeFile = file(keystoreProps['storeFile'])
+                storePassword = storePass
+                keyAlias = keystoreProps['keyAlias']
+                keyPassword = keyPass
             }
         }
     }
@@ -68,23 +67,23 @@ android {
     buildTypes {
         debug {
             // Lets a debug build be installed alongside the release app.
-            applicationIdSuffix ".debug"
-            versionNameSuffix "-debug"
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
         }
         release {
             if (canSignRelease) {
-                signingConfig signingConfigs.release
+                signingConfig = signingConfigs.release
             }
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            minifyEnabled = false
+            proguardFiles(getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro')
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
 }
 
@@ -101,7 +100,7 @@ apply from: 'download_tasks.gradle'
 dependencies {
 
     // Kotlin lang
-    implementation 'androidx.core:core-ktx:1.18.0'
+    implementation 'androidx.core:core-ktx:1.19.1'
 
     // App compat and UI things
     implementation 'androidx.appcompat:appcompat:1.8.0'

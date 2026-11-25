@@ -18,16 +18,16 @@ def TASK_FILE_SHA256 = 'fbc2a30080c3c557093b5ddfc334698132eb341044ccee322ccf8bcf
 def taskFile = file(project.ext.ASSET_DIR + '/hand_landmarker.task')
 
 def downloadTaskFile = tasks.register('downloadTaskFile', Download) {
-    src 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task'
-    dest taskFile
-    overwrite false
+    src('https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task')
+    dest(taskFile)
+    overwrite(false)
 }
 
 def verifyTaskFile = tasks.register('verifyTaskFile', Verify) {
     dependsOn downloadTaskFile
-    src taskFile
-    algorithm 'SHA-256'
-    checksum TASK_FILE_SHA256
+    src(taskFile)
+    algorithm('SHA-256')
+    checksum(TASK_FILE_SHA256)
 }
 
 preBuild.dependsOn verifyTaskFile

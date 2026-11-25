@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment_container) as NavHostFragment
         val navController = navHostFragment.navController
         activityMainBinding.navigation.setupWithNavController(navController)
-        activityMainBinding.navigation.setOnNavigationItemReselectedListener {
+        activityMainBinding.navigation.setOnItemReselectedListener {
             // ignore the reselection
         }
         onBackPressedDispatcher.addCallback(this) {

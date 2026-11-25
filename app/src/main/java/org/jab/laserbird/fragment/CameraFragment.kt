@@ -33,7 +33,8 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Camera
-import androidx.camera.core.AspectRatio
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -324,13 +325,16 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
             CameraSelector.Builder().requireLensFacing(cameraFacing).build()
 
         // Preview. Only using the 4:3 ratio because this is the closest to our models
-        preview = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+            .build()
+        preview = Preview.Builder().setResolutionSelector(resolutionSelector)
             .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
             .build()
 
         // ImageAnalysis. Using RGBA 8888 to match how our models work
         imageAnalyzer =
-            ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
+            ImageAnalysis.Builder().setResolutionSelector(resolutionSelector)
                 .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
