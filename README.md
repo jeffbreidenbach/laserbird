@@ -1,7 +1,7 @@
 # Laser Bird
 
-Laser Bird is an Android app that tracks your hand through the front camera
-and draws an animated laser effect, with sound, that follows it.
+Android app for twiddling your thumbs (okay fingers). My 11 year old
+daughter and I built this together on May 4th.
 
 Hand tracking uses the [MediaPipe Hand Landmarker](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker)
 task. The app started as a fork of Google's
