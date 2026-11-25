@@ -9,6 +9,10 @@ task. The app started as a fork of Google's
 see [NOTICE](NOTICE) for attribution. This project is not affiliated with or
 endorsed by Google.
 
+<p align="center">
+  <img src="docs/screenshot.jpg" alt="Laser Bird showing a red and a blue laser beam from two fingertips" width="300">
+</p>
+
 ## Building
 
 Requirements:
