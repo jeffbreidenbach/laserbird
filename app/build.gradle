@@ -23,6 +23,23 @@ plugins {
     id 'de.undercouch.download'
 }
 
+// Release signing is read from keystore.properties (not checked in), e.g.
+//   storeFile=/path/to/release.jks
+//   keyAlias=...
+// Passwords may also go in that file (storePassword=, keyPassword=), but it is
+// safer to supply them only for the build via environment variables:
+//   read -rs KEYSTORE_PASSWORD && export KEYSTORE_PASSWORD
+//   ./gradlew assembleRelease
+// KEY_PASSWORD defaults to the store password (the norm for PKCS12 keystores).
+def keystorePropsFile = rootProject.file('keystore.properties')
+def keystoreProps = new Properties()
+if (keystorePropsFile.exists()) {
+    keystorePropsFile.withInputStream { keystoreProps.load(it) }
+}
+def storePass = keystoreProps['storePassword'] ?: System.getenv('KEYSTORE_PASSWORD')
+def keyPass = keystoreProps['keyPassword'] ?: System.getenv('KEY_PASSWORD') ?: storePass
+def canSignRelease = keystorePropsFile.exists() && storePass
+
 android {
     namespace 'org.jab.laserbird'
     compileSdk 34
@@ -37,8 +54,22 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            if (canSignRelease) {
+                storeFile file(keystoreProps['storeFile'])
+                storePassword storePass
+                keyAlias keystoreProps['keyAlias']
+                keyPassword keyPass
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (canSignRelease) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
