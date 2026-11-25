@@ -26,25 +26,22 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import android.widget.Toast
 import androidx.camera.core.Preview
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Camera
-import androidx.camera.core.AspectRatio
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.navigation.Navigation
 import org.jab.laserbird.HandLandmarkerHelper
-import org.jab.laserbird.MainViewModel
 import org.jab.laserbird.R
 import org.jab.laserbird.databinding.FragmentCameraBinding
 import com.google.mediapipe.tasks.vision.core.RunningMode
-import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -61,7 +58,6 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
         get() = _fragmentCameraBinding!!
 
     private lateinit var handLandmarkerHelper: HandLandmarkerHelper
-    private val viewModel: MainViewModel by activityViewModels()
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private var camera: Camera? = null
@@ -93,12 +89,6 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
     override fun onPause() {
         super.onPause()
         if(this::handLandmarkerHelper.isInitialized) {
-            viewModel.setMaxHands(handLandmarkerHelper.maxNumHands)
-            viewModel.setMinHandDetectionConfidence(handLandmarkerHelper.minHandDetectionConfidence)
-            viewModel.setMinHandTrackingConfidence(handLandmarkerHelper.minHandTrackingConfidence)
-            viewModel.setMinHandPresenceConfidence(handLandmarkerHelper.minHandPresenceConfidence)
-            viewModel.setDelegate(handLandmarkerHelper.currentDelegate)
-
             // Close the HandLandmarkerHelper and release resources
             backgroundExecutor.execute { handLandmarkerHelper.clearHandLandmarker() }
         }
@@ -144,157 +134,9 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
             handLandmarkerHelper = HandLandmarkerHelper(
                 context = requireContext(),
                 runningMode = RunningMode.LIVE_STREAM,
-                minHandDetectionConfidence = viewModel.currentMinHandDetectionConfidence,
-                minHandTrackingConfidence = viewModel.currentMinHandTrackingConfidence,
-                minHandPresenceConfidence = viewModel.currentMinHandPresenceConfidence,
-                maxNumHands = viewModel.currentMaxHands,
-                currentDelegate = viewModel.currentDelegate,
                 handLandmarkerHelperListener = this
             )
         }
-
-        // Attach listeners to UI control widgets
-        initBottomSheetControls()
-    }
-
-    private fun initBottomSheetControls() {
-        // init bottom sheet settings
-        fragmentCameraBinding.bottomSheetLayout.maxHandsValue.text =
-            viewModel.currentMaxHands.toString()
-        fragmentCameraBinding.bottomSheetLayout.detectionThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinHandDetectionConfidence
-            )
-        fragmentCameraBinding.bottomSheetLayout.trackingThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinHandTrackingConfidence
-            )
-        fragmentCameraBinding.bottomSheetLayout.presenceThresholdValue.text =
-            String.format(
-                Locale.US, "%.2f", viewModel.currentMinHandPresenceConfidence
-            )
-
-        // When clicked, lower hand detection score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.detectionThresholdMinus.setOnClickListener {
-            if (handLandmarkerHelper.minHandDetectionConfidence >= 0.2) {
-                handLandmarkerHelper.minHandDetectionConfidence -= 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise hand detection score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.detectionThresholdPlus.setOnClickListener {
-            if (handLandmarkerHelper.minHandDetectionConfidence <= 0.8) {
-                handLandmarkerHelper.minHandDetectionConfidence += 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, lower hand tracking score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.trackingThresholdMinus.setOnClickListener {
-            if (handLandmarkerHelper.minHandTrackingConfidence >= 0.2) {
-                handLandmarkerHelper.minHandTrackingConfidence -= 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise hand tracking score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.trackingThresholdPlus.setOnClickListener {
-            if (handLandmarkerHelper.minHandTrackingConfidence <= 0.8) {
-                handLandmarkerHelper.minHandTrackingConfidence += 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, lower hand presence score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.presenceThresholdMinus.setOnClickListener {
-            if (handLandmarkerHelper.minHandPresenceConfidence >= 0.2) {
-                handLandmarkerHelper.minHandPresenceConfidence -= 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, raise hand presence score threshold floor
-        fragmentCameraBinding.bottomSheetLayout.presenceThresholdPlus.setOnClickListener {
-            if (handLandmarkerHelper.minHandPresenceConfidence <= 0.8) {
-                handLandmarkerHelper.minHandPresenceConfidence += 0.1f
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, reduce the number of hands that can be detected at a
-        // time
-        fragmentCameraBinding.bottomSheetLayout.maxHandsMinus.setOnClickListener {
-            if (handLandmarkerHelper.maxNumHands > 1) {
-                handLandmarkerHelper.maxNumHands--
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, increase the number of hands that can be detected
-        // at a time
-        fragmentCameraBinding.bottomSheetLayout.maxHandsPlus.setOnClickListener {
-            if (handLandmarkerHelper.maxNumHands < 2) {
-                handLandmarkerHelper.maxNumHands++
-                updateControlsUi()
-            }
-        }
-
-        // When clicked, change the underlying hardware used for inference.
-        // Current options are CPU and GPU
-        fragmentCameraBinding.bottomSheetLayout.spinnerDelegate.setSelection(
-            viewModel.currentDelegate, false
-        )
-        fragmentCameraBinding.bottomSheetLayout.spinnerDelegate.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long
-                ) {
-                    try {
-                        handLandmarkerHelper.currentDelegate = p2
-                        updateControlsUi()
-                    } catch(e: UninitializedPropertyAccessException) {
-                        Log.e(TAG, "HandLandmarkerHelper has not been initialized yet.")
-                    }
-                }
-
-                override fun onNothingSelected(p0: AdapterView<*>?) {
-                    /* no op */
-                }
-            }
-    }
-
-    // Update the values displayed in the bottom sheet. Reset Handlandmarker
-    // helper.
-    private fun updateControlsUi() {
-        fragmentCameraBinding.bottomSheetLayout.maxHandsValue.text =
-            handLandmarkerHelper.maxNumHands.toString()
-        fragmentCameraBinding.bottomSheetLayout.detectionThresholdValue.text =
-            String.format(
-                Locale.US,
-                "%.2f",
-                handLandmarkerHelper.minHandDetectionConfidence
-            )
-        fragmentCameraBinding.bottomSheetLayout.trackingThresholdValue.text =
-            String.format(
-                Locale.US,
-                "%.2f",
-                handLandmarkerHelper.minHandTrackingConfidence
-            )
-        fragmentCameraBinding.bottomSheetLayout.presenceThresholdValue.text =
-            String.format(
-                Locale.US,
-                "%.2f",
-                handLandmarkerHelper.minHandPresenceConfidence
-            )
-
-        // Needs to be cleared instead of reinitialized because the GPU
-        // delegate needs to be initialized on the thread using it when applicable
-        backgroundExecutor.execute {
-            handLandmarkerHelper.clearHandLandmarker()
-            handLandmarkerHelper.setupHandLandmarker()
-        }
-        fragmentCameraBinding.overlay.clear()
     }
 
     // Initialize CameraX, and prepare to bind the camera use cases
@@ -324,13 +166,16 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
             CameraSelector.Builder().requireLensFacing(cameraFacing).build()
 
         // Preview. Only using the 4:3 ratio because this is the closest to our models
-        preview = Preview.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
+        val resolutionSelector = ResolutionSelector.Builder()
+            .setAspectRatioStrategy(AspectRatioStrategy.RATIO_4_3_FALLBACK_AUTO_STRATEGY)
+            .build()
+        preview = Preview.Builder().setResolutionSelector(resolutionSelector)
             .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
             .build()
 
         // ImageAnalysis. Using RGBA 8888 to match how our models work
         imageAnalyzer =
-            ImageAnalysis.Builder().setTargetAspectRatio(AspectRatio.RATIO_4_3)
+            ImageAnalysis.Builder().setResolutionSelector(resolutionSelector)
                 .setTargetRotation(fragmentCameraBinding.viewFinder.display.rotation)
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_RGBA_8888)
@@ -380,9 +225,6 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
     ) {
         activity?.runOnUiThread {
             if (_fragmentCameraBinding != null) {
-                fragmentCameraBinding.bottomSheetLayout.inferenceTimeVal.text =
-                    String.format("%d ms", resultBundle.inferenceTime)
-
                 // Pass necessary information to OverlayView for drawing on the canvas
                 fragmentCameraBinding.overlay.setResults(
                     resultBundle.results.first(),
@@ -400,10 +242,13 @@ class CameraFragment : Fragment(), HandLandmarkerHelper.LandmarkerListener {
     override fun onError(error: String, errorCode: Int) {
         activity?.runOnUiThread {
             Toast.makeText(requireContext(), error, Toast.LENGTH_SHORT).show()
-            if (errorCode == HandLandmarkerHelper.GPU_ERROR) {
-                fragmentCameraBinding.bottomSheetLayout.spinnerDelegate.setSelection(
-                    HandLandmarkerHelper.DELEGATE_CPU, false
-                )
+        }
+        // If the GPU can't be used on this device, fall back to the CPU.
+        if (errorCode == HandLandmarkerHelper.GPU_ERROR && !backgroundExecutor.isShutdown) {
+            backgroundExecutor.execute {
+                handLandmarkerHelper.currentDelegate = HandLandmarkerHelper.DELEGATE_CPU
+                handLandmarkerHelper.clearHandLandmarker()
+                handLandmarkerHelper.setupHandLandmarker()
             }
         }
     }
